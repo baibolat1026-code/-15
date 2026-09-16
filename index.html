@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<title>Температура - Интерактивті ойын</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+  body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .container {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  h1 {
+    text-align: center;
+    color: #4a148c;
+    margin-bottom: 10px;
+    font-size: 2em;
+  }
+  .subtitle {
+    text-align: center;
+    color: #666;
+    margin-bottom: 25px;
+  }
+  .score {
+    background: linear-gradient(90deg, #ff9a56, #ff6a88);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 20px;
+    font-size: 1.1em;
+  }
+  .task {
+    background: #f8f9ff;
+    border-left: 5px solid #667eea;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  .task h2 {
+    color: #4a148c;
+    margin-bottom: 15px;
+  }
+  .task p { margin-bottom: 10px; line-height: 1.6; }
+  input[type="number"], input[type="text"] {
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1em;
+    width: 150px;
+    outline: none;
+    transition: 0.3s;
+  }
+  input[type="number"]:focus, input[type="text"]:focus {
+    border-color: #667eea;
+  }
+  button {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 25px;
+    font-size: 1em;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: 0.3s;
+  }
+  button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+  .feedback {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    display: none;
+  }
+  .correct { background: #d4edda; color: #155724; }
+  .wrong { background: #f8d7da; color: #721c24; }
+  .match-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 15px 0;
+  }
+  .match-col { flex: 1; min-width: 200px; }
+  .match-item {
+    background: #fff;
+    border: 2px solid #667eea;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+  }
+  .match-item:hover { background: #eef; }
+  .match-item.selected { background: #667eea; color: #fff; }
+  .match-item.matched {
+    background: #d4edda;
+    border-color: #28a745;
+    color: #155724;
+    cursor: default;
+  }
+  .match-item.wrong-match {
+    background: #f8d7da;
+    border-color: #dc3545;
+    animation: shake 0.4s;
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+  }
+  .formula-box {
+    background: #fff3cd;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border-left: 4px solid #ffc107;
+  }
+  .final-result {
+    text-align: center;
+    font-size: 1.5em;
+    color: #4a148c;
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(90deg, #ffeaa7, #fab1a0);
+    border-radius: 15px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🌡️ Температура тақырыбы</h1>
+  <p class="subtitle">8-сынып физика — Интерактивті ойын</p>
+  <div class="score">Ұпай: <span id="score">0</span> / 5</div>
+
+  <!-- 1-ТАПСЫРМА: ЕСЕП -->
+  <div class="task">
+    <h2>📝 1-тапсырма. Есеп шығару</h2>
+    <p><b>Есеп:</b> Бөлмедегі ауа температурасы термометр бойынша <b>27°C</b>. 
+    Осы температураны Кельвин шкаласы бойынша анықтаңыз.</p>
+    <div class="formula-box">
+      💡 <b>Формула:</b> T (K) = t (°C) + 273
+    </div>
+    <p>Жауабы (К): <input type="number" id="answer1" placeholder="Санды жаз"> </p>
+    <button onclick="checkTask1()">Тексеру</button>
+    <div class="feedback" id="fb1"></div>
+  </div>
+
+  <!-- 2-ТАПСЫРМА: СӘЙКЕСТЕНДІРУ -->
+  <div class="task">
+    <h2>🔗 2-тапсырма. Сәйкестендіру</h2>
+    <p>Сол жақтағы ұғымды, оң жақтағы дұрыс анықтамамен сәйкестендір. 
+    Алдымен сол жақтан, сосын оң жақтан бас.</p>
+    <div class="match-container">
+      <div class="match-col">
+        <div class="match-item" data-pair="1" data-side="left" onclick="selectMatch(this)">🌡️ Цельсий</div>
+        <div class="match-item" data-pair="2" data-side="left" onclick="selectMatch(this)">🔬 Кельвин</div>
+        <div class="match-item" data-pair="3" data-side="left" onclick="selectMatch(this)">🇺🇸 Фаренгейт</div>
+        <div class="match-item" data-pair="4" data-side="left" onclick="selectMatch(this)">📏 Термометр</div>
+      </div>
+      <div class="match-col">
+        <div class="match-item" data-pair="3" data-side="right" onclick="selectMatch(this)">АҚШ-та қолданылатын шкала</div>
+        <div class="match-item" data-pair="1" data-side="right" onclick="selectMatch(this)">Судың қатуы 0°, қайнауы 100°</div>
+        <div class="match-item" data-pair="4" data-side="right" onclick="selectMatch(this)">Температураны өлшейтін құрал</div>
+        <div class="match-item" data-pair="2" data-side="right" onclick="selectMatch(this)">Абсолюттік шкала, СИ жүйесі</div>
+      </div>
+    </div>
+    <div class="feedback" id="fb2"></div>
+  </div>
+
+  <div class="final-result" id="finalResult"></div>
+</div>
+
+<script>
+  let score = 0;
+  let task1Done = false;
+  let matchScore = 0;
+  let selectedLeft = null;
+
+  // 1-ТАПСЫРМА
+  function checkTask1() {
+    if (task1Done) return;
+    const val = parseInt(document.getElementById('answer1').value);
+    const fb = document.getElementById('fb1');
+    fb.style.display = 'block';
+    if (val === 300) {
+      fb.className = 'feedback correct';
+      fb.innerHTML = '✅ Дұрыс! T = 27 + 273 = <b>300 K</b>';
+      score++;
+      task1Done = true;
+      updateScore();
+    } else {
+      fb.className = 'feedback wrong';
+      fb.innerHTML = '❌ Қате! Қайта есептеп көр. Формуланы қолдан: T = t + 273';
+    }
+  }
+
+  // 2-ТАПСЫРМА
+  function selectMatch(el) {
+    if (el.classList.contains('matched')) return;
+    const side = el.dataset.side;
+
+    if (!selectedLeft) {
+      if (side === 'left') {
+        document.querySelectorAll('.match-item[data-side="left"]').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedLeft = el;
+      }
+    } else {
+      if (side === 'right') {
+        const fb = document.getElementById('fb2');
+        if (selectedLeft.dataset.pair === el.dataset.pair) {
+          selectedLeft.classList.remove('selected');
+          selectedLeft.classList.add('matched');
+          el.classList.add('matched');
+          matchScore++;
+          fb.style.display = 'block';
+          fb.className = 'feedback correct';
+          fb.innerHTML = '✅ Дұрыс сәйкестендірілді! (' + matchScore + '/4)';
+          score++;
+          updateScore();
+          selectedLeft = null;
+        } else {
+          el.classList.add('wrong-match');
+          fb.style.display = 'block';
+          fb.className = 'feedback wrong';
+          fb.innerHTML = '❌ Сәйкес келмейді! Қайта таңда.';
+          setTimeout(() => {
+            el.classList.remove('wrong-match');
+            fb.style.display = 'none';
+          }, 1000);
+          selectedLeft.classList.remove('selected');
+          selectedLeft = null;
+        }
+      } else {
+        document.querySelectorAll('.match-item[data-side="left"]').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedLeft = el;
+      }
+    }
+  }
+
+  function updateScore() {
+    document.getElementById('score').textContent = score;
+    if (score === 5) {
+      const fr = document.getElementById('finalResult');
+      fr.style.display = 'block';
+      fr.innerHTML = '🎉 Тамаша! Сен барлық тапсырмаларды орындадың! 🏆';
+    }
+  }
+</script>
+</body>
+</html>
